@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="quarto-1.7.32" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+
+
+<title>Technical Note on Queueing Systems</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+<!-- htmldependencies:E3FAD763 -->
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body>
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+</div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Technical Note on Queueing Systems</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="waiting-times-due-to-random-variability" class="level2">
+<h2><strong>Waiting Times due to Random Variability</strong></h2>
+<p>This technical note <strong>complements</strong> the accompanying video (<em>Module 3: Flow and Queue Management</em>) by offering a rigorous yet accessible foundation in the principles of queuing systems. It explains how queues arise, how their performance can be quantified, and what practical levers managers can use to design better queuing experiences. While the video builds intuition, this note delivers the mathematical backbone—clear, targeted, and directly applicable to real-world operational decisions.</p>
+</section>
+<section id="introduction-from-lines-to-strategic-levers" class="level2">
+<h2><strong>Introduction: From Lines to Strategic Levers</strong></h2>
+<p>Whether you’re managing a luxury hotel, a call center, or an e-commerce platform, one operational challenge consistently influences customer satisfaction and profitability: the queue. Queues are where operations meet customer experience. They determine perceptions of efficiency, fairness, and value—and can break or boost loyalty.</p>
+<p>As future managers and decision-makers, MBA students must learn to go beyond intuition and back-of-the-envelope guesses. Queue management is not just about reducing wait times—it’s about managing variability, optimizing resource allocation, and aligning service delivery with customer expectations. A short line may reflect good planning—or overstaffing. A long line may signal high demand—or poor design.</p>
+<section id="the-key-performance-indicators-of-queueing-systems" class="level3">
+<h3><strong>The Key Performance indicators of Queueing Systems</strong></h3>
+<p>Before diving into technical models, it is important to understand the core performance metrics that service managers need to monitor. In any system with waiting lines, managers want to understand how many customers or packages are waiting, how long they wait, how many are being served or processed, and how long the full experience takes from arrival to departure. These are expressed as:</p>
+<ol type="1">
+<li><em>Average number of customers/packages waiting in line (denoted by</em> <span class="math inline">\(L_q\)</span><em>- Length of queue)</em></li>
+<li><em>Average time a customer spends waiting before service (denoted by</em> <span class="math inline">\(W_q\)</span><em>- Waiting time in queue)</em></li>
+<li><em>Average number of customers in facility (denoted by</em> <span class="math inline">\(L\)</span><em>- Length of queue plus in service)</em></li>
+<li><em>Average total time a customer spends in the system (denoted by</em> <span class="math inline">\(W\)</span><em>- Waiting time in queue plus being served)</em></li>
+</ol>
+<div class="callout callout-style-default callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class='callout-icon no-icon'></i>
+</div>
+<div class="callout-title-container flex-fill">
+At the Airport- Barcelona Prat
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Imagine you are managing security operations at Barcelona–El Prat Airport. As the manager, your objective is to closely monitor key performance indicators (KPIs) related to queue management. Specifically, you need to track:</p>
+<p>• <strong>Average Queue Length</strong> <span class="math inline">\(L_q\)</span>: How many passengers are waiting on average in the security line.</p>
+<p>• <strong>Average Waiting Time in Queue</strong> <span class="math inline">\(W_q\)</span>: How long passengers wait, on average, before they begin the security check. This KPI directly impacts how early travelers must arrive at the airport. If waiting times are expected to be longer than usual, passengers must be informed promptly to ensure everyone reaches their flights on time.</p>
+<p>• <strong>Average Number of Passengers in the System</strong> <span class="math inline">\(W\)</span>: This includes passengers currently waiting in line and those actively undergoing security checks. This measure is directly related to the space needed.</p>
+<p>• <strong>Average Total Time in the System</strong> <span class="math inline">\(W\)</span>: The overall average duration passengers spend in the security process, including both waiting and screening times.</p>
+</div>
+</div>
+<p>These KPIs are crucial because they directly influence outcomes relevant to managers, including customer satisfaction, labor utilization, service levels, and operational costs. For instance, in restaurants, seating delays of thirty minutes negatively affect customer reviews compared to immediate seating, subsequently impacting future demand. Similarly, in healthcare settings, prolonged wait times correlate with lower service ratings and decreased patient retention. Managers frequently confront the following operational levers:</p>
+<ul>
+<li><p><em><strong>Staffing Levels:</strong> How many staff members must I allocate to keep the average waiting time within acceptable limits?</em></p></li>
+<li><p><em><strong>Queue Design:</strong> Should the queueing system adopt dedicated checkouts (like supermarkets), or a single serpentine queue?</em></p></li>
+<li><p><em><strong>Service Specialization:</strong> Should servers be centralized with cross-training, or specialized in specific tasks, and what implications will these choices have on key KPIs?</em></p></li>
+</ul>
+<p>To rigorously provide good estimates of the KPIs and the managerial levers, we need to understand what influences them.</p>
+</section>
+</section>
+<section id="anatomy-of-a-queueing-system" class="level2">
+<h2><strong>Anatomy of a Queueing system</strong></h2>
+<p>Three elements define any queueing system.</p>
+<section id="characteristics-of-queueing-design-system." class="level4">
+<h4><strong>Characteristics of Queueing Design System.</strong></h4>
+<p>The <strong>structure of the system</strong>, which includes the number of servers, whether lines are pooled or separate, and how customers are selected for service. Most systems follow a first-come, first-served rule, but others may prioritize based on status or need.</p>
+</section>
+<section id="characteristics-of-arrivals." class="level4">
+<h4><strong>Characteristics of Arrivals.</strong></h4>
+<p><strong>Types of items:</strong> While in the service industry we mainly think of customers as those that arrive to the system, in manufacturing or distribution settings the arriving items can be packages or material. Independent of what we are talking about the “items” are characterized by:</p>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img src="queueing_representation.png" class="framed img-fluid" style="width:50.0%" /></p>
+<figcaption>Queueing representation</figcaption>
+</figure>
+</div>
+<ol type="a">
+<li>The mean arrival rate (called <span class="math inline">\(\lambda\)</span> expressed as the number of items arriving per unit of time, i.e. 5 customers/hour or by the average time between arrivals of <span class="math inline">\(t_A=12\)</span> min/customer.</li>
+<li>The distribution of arrivals often summarized by the variability or standard deviation of interarrival times <span class="math inline">\(\sigma_A\)</span>, i.e. 8 min.</li>
+<li>To understand whether the above mentioned 8 min of standard deviation is a lot or not, one standardizes the standard deviation by its mean, the so called Coefficient of Variation of arrivals <span class="math inline">\(CV_A=\frac{\sigma}{t_A}=\frac{8}{12}=0.75\)</span>. The higher the coefficient of variation the more variable a system is.</li>
+</ol>
+</section>
+<section id="characteristics-of-servers." class="level4">
+<h4><strong>Characteristics of Servers.</strong></h4>
+<ul>
+<li><p>The number of servers an item has available to them once they finished waiting in the line. For instance, a typical supermarket where customers line up per check out, have typically one server in front of them- while a serpentine queueing system where customers could go to one of the servers has a multi server system.</p></li>
+<li><p>Like arrivals, servers are characterized by the same three service time characteristics as the arrivals, namely:</p>
+<ul>
+<li><p>an average service time <span class="math inline">\(t_S\)</span>, i.e 3 min preparation time to make a coffee or the capacity of the server <span class="math inline">\(\mu=\frac{60}{t_s}= 20\)</span> coffee per hour.</p></li>
+<li><p>the distribution of service times- or as summary statistics the standard deviation <span class="math inline">\(\sigma_S\)</span> and,</p></li>
+<li><p>the coefficient of variation of service <span class="math inline">\(CV_S=\sigma_S/t_S\)</span>.</p></li>
+</ul></li>
+</ul>
+<div class="callout callout-style-default callout-important no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class='callout-icon no-icon'></i>
+</div>
+<div class="callout-title-container flex-fill">
+A note on the coefficient of variation (CV)
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The coefficient of variation is a unitless measure of relative variability, defined as the ratio of the standard deviation to the mean (<span class="math inline">\(CV_S = \frac{\sigma_S}{t_S}\)</span>). A higher CV (significantly above 1) indicates high variability (the spread of times is large compared to the average). A lower CV (closer to 0) indicates low variability and more predictability. In general,</p>
+<ul>
+<li><p><span class="math inline">\(CV \approx 0\)</span>: Deterministic process (no variability).</p></li>
+<li><p><span class="math inline">\(CV = 1\)</span>: Typical of random processes (e.g., customers arriving independently).</p></li>
+<li><p><span class="math inline">\(CV &gt; 1\)</span>: Highly variable and unpredictable (chaotic).</p></li>
+</ul>
+<p>Managers can use CV to gauge how consistent their arrivals or service processes are. For example, a very high <span class="math inline">\(CV_A\)</span> might alert a manager to highly uneven demand (perhaps suggesting a need for appointments or reservations), and a high <span class="math inline">\(CV_S\)</span> might suggest the service process could be standardized or streamlined to be more consistent, or that the service in question is very complex and has many different services to perform.</p>
+</div>
+</div>
+<p><strong>Utilization:</strong> In our earlier capacity analysis (without wait times), we tracked how busy a server or resource was on average. In queuing analysis, utilization is a key factor: it is the fraction of time the servers are busy, essentially how much of the system’s capacity is being used by incoming demand. Utilization is defined as:</p>
+<p><span class="math display">\[\text{Utilization } (\rho)= \frac{\lambda}{S\times \mu}=\frac{\text{Arrival Rate}}{\text{Number of Servers}\times\text{Service Rate}}\]</span> This is analogous to the utilization formula in basic capacity analysis. In words: if you have <span class="math inline">\(S\)</span> servers each capable of serving <span class="math inline">\(\mu\)</span> customers per unit time (so total service capacity is <span class="math inline">\(S \times \mu\)</span> per unit time), and customers arrive at rate <span class="math inline">\(\lambda\)</span>, then <span class="math inline">\(\rho\)</span> is the fraction of service capacity being utilized by arrivals.</p>
+<ul>
+<li><p>If <span class="math inline">\(\rho &lt; 1\)</span>, the system can handle the incoming load on average (capacity exceeds demand on average). There will be some waiting, but the system will eventually catch up with arrivals.</p></li>
+<li><p>If <span class="math inline">\(\rho = 1\)</span>, the system is operating at full capacity on average. Even a slight random fluctuation can cause the queue to build indefinitely (since there’s no slack).</p></li>
+<li><p>If <span class="math inline">\(\rho &gt; 1\)</span>, the arrival rate exceeds service capacity and the queue will explode without bound (the system is fundamentally under-capacity).</p>
+<p>Managers should aim to keep $\rho$ well below 1 (typically in the 70–90% range depending on context) to provide a buffer for variability and avoid runaway queues.</p></li>
+</ul>
+<div class="callout callout-style-default callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class='callout-icon no-icon'></i>
+</div>
+<div class="callout-title-container flex-fill">
+At the Airport- Barcelona Prat
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>Characteristics of Queueing Design System</strong>:</p>
+<p>Let’s characterize the security checkpoint system with the parameters defined:</p>
+<p><strong>Arrival:</strong></p>
+<p>Suppose roughly <span class="math inline">\(\lambda= 500\)</span> passengers per hour arrive at the Terminal 1 security checkpoint during peak times. The standard deviation of arrivals might be around <span class="math inline">\(\sigma_A= 500\)</span> passengers/hour (arrivals fluctuate a lot during the hour), giving <span class="math inline">\(CV_A = \frac{500}{500} = 1.0\)</span> (high variability in arrivals).</p>
+<p><strong>Service:</strong> There are <span class="math inline">\(S = 10\)</span> security lanes open (servers). On average, one passenger can be processed in <span class="math inline">\(t_S = 1\)</span> minute (including scanning and checks), so each lane has a service rate of <span class="math inline">\(\mu = 60\)</span> passengers per hour. The standard deviation of service time might be around $\sigma_S = 0.5$ minutes (30 seconds), so $CV_S = \frac{0.5}{1} = 0.5$ (service is fairly consistent, with some variability for different passengers).</p>
+<p><strong>Arrival.</strong> <em>Arrival rate:</em> <span class="math inline">\(\lambda=500\)</span> passenger/hour</p>
+<p><em>Standard deviation:</em> <span class="math inline">\(\sigma_A=500\)</span> passenger/hour</p>
+<p><em>Coefficient of Variation</em>: <span class="math inline">\(CV_A=500/500=1\)</span></p>
+<p><strong>Service</strong>. <em>Service rate</em>: <span class="math inline">\(\mu=1/t_S=60/1\)</span> passenger/hour</p>
+<p><em>Standard deviation</em> <span class="math inline">\(σ_S=0.5\)</span> min/passenger</p>
+<p><em>Coefficient of Variation:</em> <span class="math inline">\(CV_S=0.5/1=0.5\)</span></p>
+<p><strong>Utilization</strong>.</p>
+<p>Utilization <span class="math inline">\(\rho=\frac{λ}{S×μ}=\frac{500}{10\times 60}=83\%\)</span>. This means on average <span class="math inline">\(83\%\)</span> of the security capacity is being used. There is some spare capacity (17%), but not a lot – a surge in arrivals or slowdown in service could easily create a queue.</p>
+</div>
+</div>
+<p><strong>How the KPIs are related (Little’s Law)</strong></p>
+<p>Once customers enter a system, how long they stay and how many are present are not independent. <strong>Little’s Law</strong> provides a simple yet powerful relationship between throughput, flow time, and inventory in any steady-state process. Recall from basic operations that we had:</p>
+<p><span class="math inline">\(WIP=TH\times TT\)</span> (Work in Progress= Throughput rate x Throughput time)</p>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img src="queueing_KPI.png" class="framed img-fluid" style="width:50.0%" /></p>
+<figcaption>Queueing KPIs</figcaption>
+</figure>
+</div>
+<p>In queueing systems <span class="math inline">\(WIP\)</span> the number of items that are in the system is denoted by <span class="math inline">\(L\)</span> the length of the system, or the number of items in the system.</p>
+<p>The throughput rate, in queueing systems is the arrival rate (<span class="math inline">\(\lambda\)</span>)- since the arrival rate will be smaller than the service rate (to ensure that utilization <span class="math inline">\(\rho&lt;1\)</span>).</p>
+<p>The throughput time is the time the item or customer is waiting <strong>W.</strong><br />
+Thus Little’s Law with the queuing terminology can be rewritten as:</p>
+<p><span class="math inline">\(L=\lambda \times W\)</span> (Length in System= Arrival rate x Total waiting time)</p>
+<p>Or when only considering the queueing system:</p>
+<p><span class="math inline">\(L_q=\lambda \times W_q\)</span> (Length in Queue= Arrival rate x Waiting time in queue)</p>
+<p>Additionally, and very intuitively we know that the time an item or customer spends in the system is the time they waited plus the time they were in service. Mathematically, this can be expressed as:</p>
+<p><span class="math inline">\(W=w_q+t_S\)</span></p>
+<p><strong>Now lets mark what we know from the characterization of a queueing system:</strong></p>
+<p><span class="math display">\[
+L=\textcolor{green}{\lambda} \times W \quad L_q=\textcolor{green}{\lambda} \times W \quad W= W_q + \textcolor{green}{t_S} \quad
+\]</span></p>
+<p>Clearly, if we would know one more parameter lets say <span class="math inline">\(L_q\)</span>, then we could find <span class="math inline">\(W_q\)</span>.</p>
+<p>But since we know <span class="math inline">\(W_q\)</span> we also know <span class="math inline">\(W\)</span>, and if we know <span class="math inline">\(W\)</span> we can find <span class="math inline">\(L\)</span>.</p>
+<p>Thus in summary, the knowledge of one parameter is sufficient to get all the KPI’s a manager tend to be interested in.</p>
+<p>This parameter though must clearly depend on the characteristics of the queueing system (arrivals, service, and design characteristics). The formula is an approximation but serves reasonably well to assess performance of queueing systems.</p>
+<p>To estimate <span class="math inline">\(L_q\)</span> directly, we use the Sakasegawa approximation:</p>
+<p><span class="math display">\[
+L_q = \frac{\rho^{\sqrt{2 \times (S+1)}}}{1 - \rho} \cdot \frac{CV_A^2 + CV_S^2}{2}
+\]</span></p>
+<p>Although not pretty at first and for some even scary, this formula serves as a fast approximation to estimate queue length, without restoring to simulation. It’s particularly useful in high-level planning where quick trade-off assessments are needed.</p>
+<div class="callout callout-style-default callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class='callout-icon no-icon'></i>
+</div>
+<div class="callout-title-container flex-fill">
+At the Airport- Barcelona Prat
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>To calculate the Length of the Queue (<span class="math inline">\(L_q\)</span>) we need the following:</p>
+<p>Utilization <span class="math inline">\(\rho=83\%\)</span>, Number of Servers <span class="math inline">\(S=10\)</span>, Coefficient of Variation <span class="math inline">\(CV_A=1, CV_S=0.5\)</span>. <span class="math display">\[
+L_q = \frac{\rho^{\sqrt{2 \times (S+1)}}}{1 - \rho} \cdot \frac{CV_A^2 + CV_S^2}{2}=\frac{0.83^{\sqrt{2\times(10+1)}}}{1-0.83}\frac{1^2+0.5^2}{2}=1.53 \text{ passengers}
+\]</span></p>
+<p>With this, we can also calculate the other KPIs:</p>
+<p><strong>Waiting time in Queue</strong>: <span class="math inline">\(W_q=\frac{L_q}{\lambda}=\frac{1.53}{500×3600}=11\)</span> sec.</p>
+<p><strong>Waiting time in System:</strong> <span class="math inline">\(W=W_q+t_S=11+60=71\)</span> sec.</p>
+<p><strong>Number of passengers in System:</strong> <span class="math inline">\(L=\lambda \times W= \frac{500}{3600}\times 71= 9.86\)</span> passengers.</p>
+</div>
+</div>
+<p>Now that we’ve discussed how to derive and interpret key performance indicators (KPIs) and apply the relevant queueing formula, let’s deepen our understanding by examining its individual components.</p>
+<p>The formula for the <strong>length in the queue</strong> (<span class="math inline">\(L_q\)</span>) depends on three crucial characteristics:</p>
+<ol type="1">
+<li><strong>Utilization (</strong><span class="math inline">\(\rho\)</span>),</li>
+<li><strong>Number of servers (</strong><span class="math inline">\(S\)</span>) available for customers,</li>
+<li><strong>Coefficient of variation</strong> of arrivals and service times (<span class="math inline">\(CV_A\)</span>), (<span class="math inline">\(CV_S\)</span>).</li>
+</ol>
+<p>We’ll now systematically explore how each of these factors independently influences the length of the queue.</p>
+</section>
+<section id="length-in-the-queue-l_q-as-a-function-of-utilization-rho" class="level3">
+<h3>1. Length in the Queue (<span class="math inline">\(L_q\)</span>) as a function of Utilization (<span class="math inline">\(\rho\)</span>)</h3>
+<p>To simplify our analysis and clearly isolate the effect of utilization, we temporarily set both the number of servers and coefficients of variation to 1 (<span class="math inline">\(S = CV_A = CV_S = 1\)</span>). Our formula for the queue length reduces neatly to:</p>
+<p><span class="math display">\[
+L_q = \frac{\rho^{\sqrt{2 \times (S+1)}}}{1 - \rho} \cdot \frac{CV_A^2 + CV_S^2}{2} = \frac{\rho^2}{1 - \rho}.
+\]</span></p>
+<p>Below, we illustrate how the queue length <span class="math inline">\(L_q\)</span> grows as utilization <span class="math inline">\(\rho\)</span> increases. We compute <span class="math inline">\(L_q\)</span> for utilization levels from 0 up to 0.98 (98%). Notice that as <span class="math inline">\(\rho\)</span> approaches 1 (100% utilization), the denominator <span class="math inline">\((1-\rho)\)</span> becomes very small, causing <span class="math inline">\(L_q\)</span> to blow up:</p>
+<div class="exclude" data-format="pdf">
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure>
+<p><img src="queueing_technicalnote_files/figure-html/one-.gif" class="img-fluid" width="672" /></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<p>As the graph above shows, <strong>queue length shoots up dramatically as utilization nears 100%</strong>. At moderate utilization (say <span class="math inline">\(\rho = 0.5\)</span> or <span class="math inline">\(50\%\)</span> busy), the average queue is quite small. But as you go past</p>
+<p><span class="math inline">\(80\%\)</span> or <span class="math inline">\(90\%\)</span>, <span class="math inline">\(L_q\)</span> grows rapidly. For example, increasing <span class="math inline">\(\rho\)</span> from <span class="math inline">\(90\%\)</span> to <span class="math inline">\(95\%\)</span> might double or triple the queue length. This has a clear managerial implication: <em>operating too close to full capacity is risky</em>. A system running at more than <span class="math inline">\(95\%\)</span> utilization might look efficient on paper (minimal idle time), but it will likely generate long lines and waiting times that anger customers. Managers should consider either adding capacity or controlling arrivals (through appointments, incentives to avoid peak times, etc.) to keep utilization in a safer range. A rule of thumb is to allow some “slack” in the system if customer wait time is a concern.</p>
+</section>
+<section id="length-in-the-queue-l_q-as-a-function-of-number-of-servers-s" class="level3">
+<h3>2. Length in the Queue (<strong><span class="math inline">\(L_q\)</span></strong>) as a function of Number of Servers (S):**</h3>
+<p>Next, let’s examine how the queue length changes as we vary the number of servers (<span class="math inline">\(S\)</span>). To clearly illustrate this effect, we’ll set the coefficients of variation (<span class="math inline">\(CV_A\)</span>) and (<span class="math inline">\(CV_S\)</span>) both equal to 1, and explore how (<span class="math inline">\(L_q\)</span>) behaves as we increase (<span class="math inline">\(S\)</span>) for a fixed level of utilization (<span class="math inline">\(\rho\)</span>).</p>
+<p>The simplified formula in this scenario becomes:</p>
+<p><span class="math display">\[
+L_q = \frac{\rho^{\sqrt{2 \times (S+1)}}}{1 - \rho} \cdot \frac{CV_A^2 + CV_S^2}{2} = \frac{\rho^{\sqrt{2\times(S+1)}}}{1-\rho}
+\]</span></p>
+<p>Below, we show how the queue length (<span class="math inline">\(L_q\)</span>) decreases as we increment the number of servers (<span class="math inline">\(S\)</span>) from 1 up to 10, highlighting how additional servers reduce congestion and improve customer experience.</p>
+<div class="exclude" data-format="pdf">
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure>
+<p><img src="queueing_technicalnote_files/figure-html/second-.gif" class="img-fluid" width="672" /></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="length-in-the-queue-l_q-as-a-function-of-coefficient-of-variations-cv" class="level3">
+<h3>3. Length in the Queue (<strong><span class="math inline">\(L_q\)</span></strong>) as a function of Coefficient of Variations (<strong><span class="math inline">\(CV\)</span></strong>):**</h3>
+<p>Finally, let’s examine how the queue length changes as we vary the coefficient of variations (<span class="math inline">\(CV\)</span>). To do this let us focus on the coefficent of variations for arrivals <span class="math inline">\(CV_A\)</span> and for illustrative purposes let the coefficient of variations of service be <span class="math inline">\(CV_S=0\)</span>. Furthermore, as before we let the number of servers be <span class="math inline">\(S=1\)</span>. In this case the approximation formula simplifies to:</p>
+<p><span class="math display">\[
+L_q = \frac{\rho^{\sqrt{2 \times (S+1)}}}{1 - \rho} \cdot \frac{CV_A^2 + CV_S^2}{2} = \frac{\rho^{2}}{1-\rho}\cdot\frac{CV_A^2}{2}
+\]</span></p>
+<div class="exclude" data-format="pdf">
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure>
+<p><img src="queueing_technicalnote_files/figure-html/third-.gif" class="img-fluid" width="672" /></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<p>The chart illustrates that <strong>lower variability leads to shorter queues</strong> for the same average utilization. In the extreme case (<span class="math inline">\(CV_A = 0\)</span>, the dark red line), arrivals are perfectly steady (e.g., exactly one customer every fixed interval). Here, you see that <span class="math inline">\(L_q\)</span> remains very low up until extremely high utilizations because the system is not experiencing any random surges – customers arrive like clockwork and are processed in an orderly fashion. On the other hand, the top line (<span class="math inline">\(CV_A = 1.0\)</span>, light red/pink) shows much higher queues at moderate utilizations because arrivals can bunch up randomly (for example, you might get 5 customers arriving almost at once, then a gap, etc., causing a backlog).</p>
+<p><strong>Managerial insight:</strong> Reducing variability is a powerful lever for improving queue performance. While variability is sometimes outside your direct control (e.g., random customer walk-ins), there are ways to manage it:</p>
+<ul>
+<li><p><em>Arrival variability:</em> Can be mitigated by smoothing demand. For instance, use appointment systems, require reservations, offer incentives for customers to come at off-peak times, or use queue management tools that meter entry (e.g., allowing a certain number of people into a system per minute).</p></li>
+<li><p><em>Service time variability:</em> Can be reduced by standardizing procedures, training staff to a consistent performance level, or segmenting customers by service requirements (so that simple tasks are handled in one line, complex tasks in another, ensuring that a single slow transaction doesn’t hold up everyone behind them).</p></li>
+<li><p><em>Buffering variability:</em> Even if you can’t reduce inherent variability, you can buffer against it – for example, having a <strong>pool</strong> of servers/agents that can be activated when there’s a sudden surge (on-call staff or multi-skilled employees who can jump in).</p></li>
+</ul>
+<p>Reducing variability has a similar effect to increasing capacity: it cuts down wait times. In some cases, it might even be more cost-effective – e.g., smoothing out an appointment schedule costs nothing but can eliminate the need to hire an additional full-time staff member just to handle unpredictable peaks.</p>
+</section>
+</section>
+<section id="managerial-levers-designing-a-better-queue" class="level2">
+<h2><strong>Managerial Levers: Designing a Better Queue</strong></h2>
+<p>In summary, managers have <strong>three major levers</strong> to improve queue performance and customer experience:</p>
+<ol type="1">
+<li><p><strong>Add Capacity (Increase Servers or Service Rate):</strong> If wait times are too high, one solution is to increase the service capacity. This could mean adding more servers (staff, checkout lanes, call center agents, etc.) or improving service rates (training staff to work faster, introducing self-service kiosks to handle simpler tasks, etc.). The impact of this lever is directly seen in utilization <span class="math inline">\(\rho\)</span>: more capacity means lower <span class="math inline">\(\rho\)</span> for the same arrival rate, which prevents the explosive growth of queues as shown earlier. <em>Trade-off:</em> Additional capacity incurs higher costs (labor, equipment). A manager must balance the cost of extra capacity against the benefit of shorter queues (and the improved customer satisfaction or higher throughput that results).</p></li>
+<li><p><strong>Reduce Variability (Stabilize Arrivals/Service):</strong> As we saw, high variability in demand or service times amplifies queues. Managers can implement strategies to smooth demand (reservations, appointments, dynamic pricing to shift demand, etc.) and streamline service (standard operating procedures, training for consistency, or even small process improvements like having paperwork filled in advance). Reducing variability (lower <span class="math inline">\(CV_A\)</span> and <span class="math inline">\(CV_S\)</span>) makes the system more predictable and queue lengths more manageable. <em>Trade-off:</em> It may require operational changes or enforce restrictions on customers (which need to be managed carefully to avoid inconvenience). For example, requiring appointments can level demand but might deter spontaneous customers.</p></li>
+<li><p><strong>Pooling and Flexibility:</strong> <strong>Pooling</strong> means combining queues or resources so that variability is shared. Instead of two separate queues for two servers (where one server might be idle while the other has a line), a single pooled queue ensures both servers are almost always busy when there is demand, and customers are served in order. Pooling greatly reduces the probability that one server is starving while another is overwhelmed. Similarly, cross-training staff (flexibility) means employees can shift to where the need is highest, effectively creating a pooled resource. Pooling <strong>reduces the impact of variability</strong> because fluctuations even out across a larger system. For managers, this could mean using a common queue for all checkouts, having a universal call center instead of dedicated lines for each region, or deploying “floaters” who can assist wherever a line starts forming. <em>Trade-off:</em> Pooled systems can sometimes feel less personal, and cross-training staff requires broader skills (and possibly higher wages). Also, customers might perceive a single long queue as worse than multiple shorter ones, even if the wait time is the same, so communication and expectation management are key.</p></li>
+</ol>
+<p>Finally, it’s worth remembering that <strong>queues are symptoms of deeper issues</strong> in operations design. A smart manager doesn’t just fight fires by yelling at employees to work faster when lines get long; instead, they <strong>redesign the system</strong>. This technical note introduced key concepts and formulas to <em>quantitatively</em> analyze queues. Using these insights, managers can move from reactive to proactive management. By anticipating how utilization and variability interact to create waits, and by leveraging capacity and pooling strategically, you can design service systems that keep waits within acceptable limits. The result: <strong>happier customers, more efficient operations, and a healthier bottom line</strong>.</p>
+</section>
+
+</main>
+<!-- /main column -->
+<script id = "quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+</body>
+
+</html>
