@@ -1,0 +1,45 @@
+.callout-note {
+  border-left: 4px solid #007acc;
+  background: #f0f8ff;
+  padding: 1em;
+  margin: 1em 0;
+}
+
+@import url("https://quarto.org/css/quarto-html.css");
+
+.grey-bg {
+  background-color: #f0f0f0;
+  padding: 1em;
+  border-radius: 5px;
+}
+
+.red-bg {
+  background-color: #ffcccc;
+  padding: 1em;
+  border-radius: 5px;
+}
+
+p {
+  text-align: justify;
+}
+
+
+.title {
+  text-align: center;
+}
+
+.centered-heading {
+  text-align: center;
+}
+.framed {
+  border: 2px solid #444;
+  padding: 4px;
+  display: block;
+  margin: 1em 0;
+}
+.wrap-left {
+  float: left;
+  margin: 0 1em 1em 0;
+  border: 2px solid #444;
+  padding: 4px;
+}
